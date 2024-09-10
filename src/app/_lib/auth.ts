@@ -7,17 +7,21 @@ export async function getToken(code: string) {
     throw new Error("Missing environment variables");
   }
 
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: redirectUri,
+  });
+
+  console.log("💖body", JSON.stringify(body));
+
   const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
     },
-    body: new URLSearchParams({
-      grant_type: "authorization_code",
-      code,
-      redirect_uri: redirectUri,
-    }),
+    body,
   });
 
   const data = await response.json();
