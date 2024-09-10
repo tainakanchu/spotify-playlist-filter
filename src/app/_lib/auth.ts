@@ -13,8 +13,6 @@ export async function getToken(code: string) {
     redirect_uri: redirectUri,
   });
 
-  console.log("💖body", JSON.stringify(body));
-
   const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: {
