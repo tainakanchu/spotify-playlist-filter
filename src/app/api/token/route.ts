@@ -2,8 +2,6 @@ import { getToken } from "@/app/_lib/auth";
 import type { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-  console.log("💖req.url", req.url);
-
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
 
