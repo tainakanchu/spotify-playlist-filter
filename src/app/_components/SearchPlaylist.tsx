@@ -135,13 +135,15 @@ export default function SearchSpotify() {
             Spotify Playlist Search with features
           </h1>
           <div className="flex gap-4 w-full">
-            <input
-              type="text"
-              className="p-4 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-white flex-grow"
-              placeholder="Input keyword"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-            />
+            <div className="flex-grow">
+              <input
+                type="text"
+                className="p-4 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-white w-full"
+                placeholder="Input keyword"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
+            </div>
             <button
               className={`p-4 bg-green-500 text-white rounded-lg transition-opacity duration-300 ease-in-out ${
                 !keyword ? "opacity-50 cursor-not-allowed" : ""
