@@ -8,6 +8,7 @@ import { PlayListCard } from "./PlayListCard";
 export type PlaylistWithMeta = SpotifyApi.PlaylistObjectFull & {
   instrumentalness: number;
   danceability: number;
+  artists: string[];
 };
 
 export default function SearchSpotify() {
@@ -33,15 +34,27 @@ export default function SearchSpotify() {
 
           const features = items.map(async (playlist) => {
             // トラック情報の取得
-            const audioIdList = await fetchWebApi<
+            const audioList = await fetchWebApi<
               SpotifyApi.PagingObject<SpotifyApi.PlaylistTrackObject>
             >(playlist.tracks.href, "GET").then((data) => {
-              return data.items
-                .map((el) => {
-                  return el.track?.id;
-                })
-                .filter((id): id is string => id !== null);
+              return data.items.map((el) => {
+                return el.track;
+              });
             });
+
+            const artistList = Array.from(
+              new Set(
+                audioList
+                  .map((el) => {
+                    return el?.artists[0].name;
+                  })
+                  .filter((name): name is string => name !== null),
+              ),
+            );
+
+            const audioIdList = audioList
+              .map((el) => el?.id)
+              .filter((id): id is string => id !== null);
 
             const feature =
               await fetchWebApi<SpotifyApi.MultipleAudioFeaturesResponse>(
@@ -68,6 +81,7 @@ export default function SearchSpotify() {
             return {
               instrumentalness,
               danceability,
+              artistList,
             };
           });
 
@@ -79,6 +93,7 @@ export default function SearchSpotify() {
                     ...playlist,
                     instrumentalness: meta[index].instrumentalness,
                     danceability: meta[index].danceability,
+                    artists: meta[index].artistList,
                   };
                 }),
               );
@@ -98,15 +113,15 @@ export default function SearchSpotify() {
 
   return (
     <SpotifyProvider>
-      <div className="grid grid-rows-[20px_1fr_20px] justify-items-center min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] ">
-        <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+      <div className="justify-items-center min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] ">
+        <main className="flex flex-col gap-4 row-start-2 items-center sm:items-start">
           <h1 className="text-4xl font-bold">
             Spotify Playlist Search with features
           </h1>
-          <div className="flex gap-4">
+          <div className="flex gap-4 w-full">
             <input
               type="text"
-              className="p-4 border border-gray-300 rounded-lg w-96 dark:bg-gray-800 dark:text-white"
+              className="p-4 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-white flex-grow"
               placeholder="Input keyword"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
