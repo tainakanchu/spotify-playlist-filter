@@ -21,10 +21,6 @@ export const SpotifyProvider: React.FC<Props> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
-  const [me, setMe] = useState<SpotifyApi.CurrentUsersProfileResponse | null>(
-    null,
-  );
-
   return (
     <SpotifyContext.Provider
       value={{
