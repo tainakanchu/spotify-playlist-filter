@@ -2,8 +2,10 @@
 import { SpotifyProvider } from "../_context/SpotifyContext";
 import { useCallback, useState } from "react";
 import { useFetchWebApi } from "../_utils/fetchWebApi";
+import { Progress } from "./Progress";
+import { PlayListCard } from "./PlayListCard";
 
-type PlaylistWithMeta = SpotifyApi.PlaylistObjectFull & {
+export type PlaylistWithMeta = SpotifyApi.PlaylistObjectFull & {
   instrumentalness: number;
   danceability: number;
 };
@@ -17,12 +19,16 @@ export default function SearchSpotify() {
 
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [searching, setSearching] = useState(false);
+
   const search = useCallback(
     (keyword: string) => {
+      setSearching(true);
       setErrorMessage("");
+      setPlaylists([]);
 
       searchPlaylist(keyword)
-        .then((data) => {
+        .then(async (data) => {
           const items = data.playlists.items as SpotifyApi.PlaylistObjectFull[];
 
           const features = items.map(async (playlist) => {
@@ -65,21 +71,26 @@ export default function SearchSpotify() {
             };
           });
 
-          Promise.all(features).then((meta) => {
-            setPlaylists(
-              items.map((playlist, index) => {
-                return {
-                  ...playlist,
-                  instrumentalness: meta[index].instrumentalness,
-                  danceability: meta[index].danceability,
-                };
-              }),
-            );
-          });
+          await Promise.all(features)
+            .then((meta) => {
+              setPlaylists(
+                items.map((playlist, index) => {
+                  return {
+                    ...playlist,
+                    instrumentalness: meta[index].instrumentalness,
+                    danceability: meta[index].danceability,
+                  };
+                }),
+              );
+            })
+            .finally(() => {
+              setSearching(false);
+            });
         })
         .catch((e) => {
           console.error(e);
           setErrorMessage(e.message);
+          setSearching(false);
         });
     },
     [fetchWebApi, searchPlaylist],
@@ -107,7 +118,7 @@ export default function SearchSpotify() {
               onClick={() => {
                 search(keyword);
               }}
-              disabled={!keyword}
+              disabled={!keyword || searching}
               type="button"
             >
               Search
@@ -122,46 +133,16 @@ export default function SearchSpotify() {
             )}
           </div>
 
-          {playlists.map(
-            ({
-              name,
-              instrumentalness,
-              danceability,
-              external_urls,
-              snapshot_id,
-            }) => {
-              // 小数点第2位までの%表示
-              const instrumentalnessText = (instrumentalness * 100).toFixed(2);
-              const danceabilityText = (danceability * 100).toFixed(2);
+          {searching && <Progress />}
 
-              return (
-                <div
-                  key={snapshot_id}
-                  className="flex flex-col gap-4 items-center sm:items-start"
-                >
-                  <div className="flex flex-col gap-2 items-center sm:items-start">
-                    <h2 className="text-xl font-bold">{name}</h2>
-                  </div>
-
-                  <div>
-                    <p>インスト度: {`${instrumentalnessText}%`}</p>
-                  </div>
-                  <div>
-                    <p>踊りやすさ: {`${danceabilityText}%`}</p>
-                  </div>
-
-                  <a
-                    href={external_urls.spotify}
-                    target="_blank"
-                    className="p-4 bg-green-500 text-white rounded-lg"
-                    rel="noreferrer"
-                  >
-                    Open in Spotify
-                  </a>
-                </div>
-              );
-            },
-          )}
+          {playlists.map((playlistWithMeta) => {
+            return (
+              <PlayListCard
+                key={playlistWithMeta.snapshot_id}
+                {...playlistWithMeta}
+              />
+            );
+          })}
         </main>
       </div>
     </SpotifyProvider>
