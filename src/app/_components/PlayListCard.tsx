@@ -1,6 +1,8 @@
 "use client";
 import type { PlaylistWithMeta } from "./SearchPlaylist";
 
+const ARTIST_COUNT = 15;
+
 export const PlayListCard: React.FC<PlaylistWithMeta> = ({
   name,
   instrumentalness,
@@ -29,8 +31,8 @@ export const PlayListCard: React.FC<PlaylistWithMeta> = ({
           <h2 className="text-xl font-bold">{name}</h2>
 
           <p className="text-[0.7rem] text-gray-300">
-            {`${artists.slice(0, 10).join(", ")}`}
-            {artists.length > 10 ? " and more..." : ""}
+            {`${artists.slice(0, ARTIST_COUNT).join(", ")}`}
+            {artists.length > ARTIST_COUNT ? ", and more..." : ""}
           </p>
           <ul>
             <li>

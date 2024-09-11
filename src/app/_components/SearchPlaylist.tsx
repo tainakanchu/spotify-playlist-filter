@@ -11,6 +11,24 @@ export type PlaylistWithMeta = SpotifyApi.PlaylistObjectFull & {
   artists: string[];
 };
 
+function normalizeArray(arr: string[]): string[] {
+  // 頻度をカウントするためのマップを作成
+  const frequencyMap = arr.reduce(
+    (acc, item) => {
+      acc[item] = (acc[item] || 0) + 1;
+      return acc;
+    },
+    {} as { [key: string]: number },
+  );
+
+  // 頻度の高い順にソート
+  const sortedArray = Object.keys(frequencyMap).sort(
+    (a, b) => frequencyMap[b] - frequencyMap[a],
+  );
+
+  return sortedArray;
+}
+
 export default function SearchSpotify() {
   const [keyword, setKeyword] = useState("");
 
@@ -42,14 +60,12 @@ export default function SearchSpotify() {
               });
             });
 
-            const artistList = Array.from(
-              new Set(
-                audioList
-                  .map((el) => {
-                    return el?.artists[0].name;
-                  })
-                  .filter((name): name is string => name !== null),
-              ),
+            const artistList = normalizeArray(
+              audioList
+                .map((el) => {
+                  return el?.artists[0].name;
+                })
+                .filter((name): name is string => name !== null),
             );
 
             const audioIdList = audioList
