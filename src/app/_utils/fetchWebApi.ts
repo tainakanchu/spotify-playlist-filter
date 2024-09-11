@@ -6,19 +6,11 @@ export const useFetchWebApi = () => {
     endpoint: string,
     method: string,
     body?: { [key: string]: string }
-  ) => {
-    const fullEndpoint = endpoint.includes("https://api.spotify.com")
-      ? endpoint
-      : `https://api.spotify.com/${endpoint}`;
-
-    const res = await fetch(fullEndpoint, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      method,
-      body: JSON.stringify(body),
-    });
-    return (await res.json()) as T;
+  ): Promise<T> => {
+    if (!accessToken) {
+      throw new Error("Access token is required");
+    }
+    return fetchSpotifyApi<T>(accessToken, endpoint, method, body);
   };
 
   const searchPlaylist = async (
@@ -44,4 +36,24 @@ export const useFetchWebApi = () => {
     searchPlaylist,
     getMe,
   };
+};
+
+export const fetchSpotifyApi = async <T>(
+  accessToken: string,
+  endpoint: string,
+  method: string,
+  body?: { [key: string]: string }
+) => {
+  const fullEndpoint = endpoint.includes("https://api.spotify.com")
+    ? endpoint
+    : `https://api.spotify.com/${endpoint}`;
+
+  const res = await fetch(fullEndpoint, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    method,
+    body: JSON.stringify(body),
+  });
+  return (await res.json()) as T;
 };

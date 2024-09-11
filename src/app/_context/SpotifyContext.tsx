@@ -7,8 +7,6 @@ interface SpotifyContextProps {
   setAccessToken: (token: string | null) => void;
   refreshToken: string | null;
   setRefreshToken: (token: string | null) => void;
-  me: SpotifyApi.CurrentUsersProfileResponse | null;
-  setMe: (me: SpotifyApi.CurrentUsersProfileResponse | null) => void;
 }
 
 const SpotifyContext = createContext<SpotifyContextProps | undefined>(
@@ -34,8 +32,6 @@ export const SpotifyProvider: React.FC<Props> = ({ children }) => {
         setAccessToken,
         refreshToken,
         setRefreshToken,
-        me,
-        setMe,
       }}
     >
       {children}
