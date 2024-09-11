@@ -1,4 +1,5 @@
 "use client";
+import { Gage } from "./Gage";
 import type { PlaylistWithMeta } from "./SearchPlaylist";
 
 const ARTIST_COUNT = 15;
@@ -11,13 +12,9 @@ export const PlayListCard: React.FC<PlaylistWithMeta> = ({
   images,
   artists,
 }) => {
-  // 小数点第2位までの%表示
-  const instrumentalnessText = (instrumentalness * 100).toFixed(2);
-  const danceabilityText = (danceability * 100).toFixed(2);
-
   return (
     <div className="p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 w-full hover:opacity-90 transition-opacity duration-300 ease-in-out">
-      <div className="flex flex-row gap-4 items-start">
+      <div className="flex flex-col sm:flex-row gap-4 items-start">
         <div className="w-32 h-32 flex-shrink-0">
           <a href={external_urls.spotify} target="_blank" rel="noreferrer">
             <img
@@ -27,7 +24,7 @@ export const PlayListCard: React.FC<PlaylistWithMeta> = ({
             />
           </a>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 grow">
           <h2 className="text-xl font-bold">{name}</h2>
 
           <p className="text-[0.7rem] text-gray-300">
@@ -36,10 +33,10 @@ export const PlayListCard: React.FC<PlaylistWithMeta> = ({
           </p>
           <ul>
             <li>
-              <p>instrumentalness: {`${instrumentalnessText}%`}</p>
+              <Gage label="instrumentalness" value={instrumentalness} />
             </li>
             <li>
-              <p>danceability: {`${danceabilityText}%`}</p>
+              <Gage label="danceability" value={danceability} />
             </li>
           </ul>
         </div>
