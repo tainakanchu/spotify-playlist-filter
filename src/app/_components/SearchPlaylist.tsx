@@ -1,5 +1,4 @@
 "use client";
-import { SpotifyProvider } from "../_context/SpotifyContext";
 import { useCallback, useState } from "react";
 import { useFetchWebApi } from "../_utils/fetchWebApi";
 import { Progress } from "./Progress";
@@ -128,56 +127,54 @@ export default function SearchSpotify() {
   );
 
   return (
-    <SpotifyProvider>
-      <div className="justify-items-center min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] ">
-        <main className="flex flex-col gap-4 row-start-2 items-center sm:items-start">
-          <h1 className="text-4xl font-bold">
-            Spotify Playlist Search with features
-          </h1>
-          <div className="flex gap-4 w-full">
-            <div className="flex-grow">
-              <input
-                type="text"
-                className="p-4 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-white w-full"
-                placeholder="Input keyword"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-              />
+    <div className="justify-items-center min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] ">
+      <main className="flex flex-col gap-4 row-start-2 items-center sm:items-start">
+        <h1 className="text-4xl font-bold">
+          Spotify Playlist Search with features
+        </h1>
+        <div className="flex gap-4 w-full">
+          <div className="flex-grow">
+            <input
+              type="text"
+              className="p-4 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-white w-full"
+              placeholder="Input keyword"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+          <button
+            className={`p-4 bg-green-500 text-white rounded-lg transition-opacity duration-300 ease-in-out ${
+              !keyword ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={() => {
+              search(keyword);
+            }}
+            disabled={!keyword || searching}
+            type="button"
+          >
+            Search
+          </button>
+        </div>
+        <div>
+          {errorMessage && (
+            <div>
+              <p className="text-red-400">エラーが発生しました</p>
+              <p className="text-red-400 text-xs">{errorMessage}</p>
             </div>
-            <button
-              className={`p-4 bg-green-500 text-white rounded-lg transition-opacity duration-300 ease-in-out ${
-                !keyword ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              onClick={() => {
-                search(keyword);
-              }}
-              disabled={!keyword || searching}
-              type="button"
-            >
-              Search
-            </button>
-          </div>
-          <div>
-            {errorMessage && (
-              <div>
-                <p className="text-red-400">エラーが発生しました</p>
-                <p className="text-red-400 text-xs">{errorMessage}</p>
-              </div>
-            )}
-          </div>
+          )}
+        </div>
 
-          {searching && <Progress />}
+        {searching && <Progress />}
 
-          {playlists.map((playlistWithMeta) => {
-            return (
-              <PlayListCard
-                key={playlistWithMeta.snapshot_id}
-                {...playlistWithMeta}
-              />
-            );
-          })}
-        </main>
-      </div>
-    </SpotifyProvider>
+        {playlists.map((playlistWithMeta) => {
+          return (
+            <PlayListCard
+              key={playlistWithMeta.snapshot_id}
+              {...playlistWithMeta}
+            />
+          );
+        })}
+      </main>
+    </div>
   );
 }
